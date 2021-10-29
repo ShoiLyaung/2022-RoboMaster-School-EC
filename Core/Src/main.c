@@ -79,8 +79,9 @@ uint8_t swi[4];
 int16_t xyz[3];
 int16_t chassis[4];
 
+
 /*set steering angle*/
-int PWMS[4],angle[4]={25,25,25,25},angle1[4]={125,125,125,125};
+int PWMS[4],angle[4]={25,25,25,25},angle1[4]={125,125,125,125},angle2[4]={100,100,100,100};
 
 int PWMLF1,PWMLF2,PWMRF1,PWMRF2,PWMLB1,PWMLB2,PWMRB1,PWMRB2;
 int x,y,z;
@@ -158,11 +159,10 @@ void Set_Pwm(int m1,int m2,int m3,int m4,int s0,int s1,int s2,int s3)
 	    if(m4>0)			    PWMRF1=m4,PWMRF2=0;
 			else 	          PWMRF2=m4,PWMRF1=0;
 		  
-			if(s0!=0)			    PWMS[0]=angle1[0];
-			else 	          PWMS[0]=angle[0];
 	
-			if(s1!=0)			    PWMS[1]=angle1[1];
-			else 	          PWMS[1]=angle[1];
+			if(s1!=0)			    PWMS[0]=angle2[0];
+			else if(s0!=0)		PWMS[0]=angle1[0];
+			else							PWMS[0]=angle[0];
 	
 			if(s2!=0)			    PWMS[2]=angle1[2];
 			else 	          PWMS[2]=angle[2];
@@ -289,10 +289,10 @@ int main(void)
 		xyz[0]=Max(r->rocker[0].y_position,150);
 		xyz[1]=Max(r->rocker[0].x_position,150);
 		xyz[2]=Max(r->rocker[1].x_position,150);
-		chassis[0]=xyz[0]+xyz[1]+xyz[2];			//MT1
-    chassis[1]=xyz[0]-xyz[1]+xyz[2];			//MT2
-    chassis[2]=xyz[0]+xyz[1]-xyz[2];		//MT3
-    chassis[3]=xyz[0]-xyz[1]-xyz[2];		//MT4
+		chassis[0]=-xyz[0]+xyz[1]+xyz[2];			//MT1
+    chassis[1]=-xyz[0]-xyz[1]+xyz[2];			//MT2
+    chassis[2]=-xyz[0]+xyz[1]-xyz[2];		//MT3
+    chassis[3]=-xyz[0]-xyz[1]-xyz[2];		//MT4
 		/*********************
 		********PID***********
 		*********************/
@@ -315,7 +315,7 @@ int main(void)
 			
 		message[0]=chassis[0];
 		message[1]=fdb[0];
-		sendware(message,sizeof(message));
+//		sendware(message,sizeof(message));
 		
 		/*steering control*/
 		swi[0]=r->Switch[0];
